@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:padding="16dp"
             android:textSize="20sp" />
-        
+
     </ScrollView>
     <!--TODO (2) Make the width of the ScrollView match_parent and the height wrap_content-->
 

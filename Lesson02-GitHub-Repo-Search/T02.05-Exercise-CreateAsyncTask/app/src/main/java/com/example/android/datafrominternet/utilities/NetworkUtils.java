@@ -71,8 +71,12 @@ public class NetworkUtils {
      * @throws IOException Related to network and stream reading
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+
+        // Open an HttpUrlConnection with this url
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
+
+            // Read in the contents, all at once
             InputStream in = urlConnection.getInputStream();
 
             Scanner scanner = new Scanner(in);

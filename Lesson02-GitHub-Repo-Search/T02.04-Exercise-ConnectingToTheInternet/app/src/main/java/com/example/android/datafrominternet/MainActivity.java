@@ -24,7 +24,11 @@ import android.widget.TextView;
 
 import com.example.android.datafrominternet.utilities.NetworkUtils;
 
+import java.io.IOException;
 import java.net.URL;
+
+import static android.os.Build.VERSION_CODES.N;
+import static com.example.android.datafrominternet.utilities.NetworkUtils.getResponseFromHttpUrl;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -52,10 +56,25 @@ public class MainActivity extends AppCompatActivity {
      * our (not yet created) {@link GithubQueryTask}
      */
     private void makeGithubSearchQuery() {
+
+        // Edit text contents are our search term
         String githubQuery = mSearchBoxEditText.getText().toString();
+
+        // Get a URL out of our search term
         URL githubSearchUrl = NetworkUtils.buildUrl(githubQuery);
+
+        // Display the URL in string form with our edit text
         mUrlDisplayTextView.setText(githubSearchUrl.toString());
+
         // TODO (2) Call getResponseFromHttpUrl and display the results in mSearchResultsTextView
+        String httpResponse = null;
+        try {
+            httpResponse = NetworkUtils.getResponseFromHttpUrl(githubSearchUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mSearchResultsTextView.setText(httpResponse);
         // TODO (3) Surround the call to getResponseFromHttpUrl with a try / catch block to catch an IOException
     }
 

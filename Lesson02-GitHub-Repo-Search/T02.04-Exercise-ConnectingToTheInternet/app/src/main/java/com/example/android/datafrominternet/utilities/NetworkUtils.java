@@ -48,11 +48,16 @@ public class NetworkUtils {
      * @return The URL to use to query the GitHub.
      */
     public static URL buildUrl(String githubSearchQuery) {
+
+        // Build a Uri using the base uri and appending the
+        // search query term as well as the sort by query
         Uri builtUri = Uri.parse(GITHUB_BASE_URL).buildUpon()
                 .appendQueryParameter(PARAM_QUERY, githubSearchQuery)
                 .appendQueryParameter(PARAM_SORT, sortBy)
                 .build();
 
+        // Convert this Uri into a URL by passing it in string form
+        // to the URL constructor. This may cause an exception.
         URL url = null;
         try {
             url = new URL(builtUri.toString());
@@ -60,6 +65,7 @@ public class NetworkUtils {
             e.printStackTrace();
         }
 
+        // Return this url
         return url;
     }
 

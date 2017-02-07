@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 // TODO (1) Implement OnPreferenceChangeListener
 public class SettingsFragment extends PreferenceFragmentCompat implements
-        OnSharedPreferenceChangeListener {
+        OnSharedPreferenceChangeListener, Preference.OnPreferenceChangeListener {
 
     @Override
     public void onCreatePreferences(Bundle bundle, String s) {
@@ -37,21 +37,31 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
         // Add visualizer preferences, defined in the XML file in res->xml->pref_visualizer
         addPreferencesFromResource(R.xml.pref_visualizer);
 
+        // Get the shared preferences from the pref_isualizer
         SharedPreferences sharedPreferences = getPreferenceScreen().getSharedPreferences();
         PreferenceScreen prefScreen = getPreferenceScreen();
+
+        // Get how many preferences there are
         int count = prefScreen.getPreferenceCount();
 
         // Go through all of the preferences, and set up their preference summary.
         for (int i = 0; i < count; i++) {
+
             Preference p = prefScreen.getPreference(i);
+
             // You don't need to set up preference summaries for checkbox preferences because
             // they are already set up in xml using summaryOff and summary On
             if (!(p instanceof CheckBoxPreference)) {
+
+                // Anything else, get the value and update the summary
                 String value = sharedPreferences.getString(p.getKey(), "");
                 setPreferenceSummary(p, value);
             }
         }
+
         // TODO (3) Add the OnPreferenceChangeListener specifically to the EditTextPreference
+        Preference preference = findPreference(getString(R.string.pref_size_key));
+        preference.setOnPreferenceChangeListener(this);
     }
 
     @Override
@@ -74,15 +84,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
      * @param value      The value that the preference was updated to
      */
     private void setPreferenceSummary(Preference preference, String value) {
+
         if (preference instanceof ListPreference) {
+
             // For list preferences, figure out the label of the selected value
             ListPreference listPreference = (ListPreference) preference;
             int prefIndex = listPreference.findIndexOfValue(value);
+
             if (prefIndex >= 0) {
+
                 // Set the summary to that label
                 listPreference.setSummary(listPreference.getEntries()[prefIndex]);
             }
+
         } else if (preference instanceof EditTextPreference) {
+
             // For EditTextPreferences, set the summary to the value's simple string representation.
             preference.setSummary(value);
         }
@@ -92,6 +108,43 @@ public class SettingsFragment extends PreferenceFragmentCompat implements
     // to a float; if it cannot, show a helpful error message and return false. If it can be converted
     // to a float check that that float is between 0 (exclusive) and 3 (inclusive). If it isn't, show
     // an error message and return false. If it is a valid number, return true.
+
+    // This gets called before the preference is saved. Thus, we don't need to do error checking
+    // anywhere else because this will stop us if there's something wrong. It returns true if
+    // everything is okay, and false otherwise.
+    @Override
+    public boolean onPreferenceChange(Preference preference, Object newValue) {
+
+        // Error to display if something goes wrong
+        Toast error = Toast.makeText(getContext(), "Please select a number between 0.1 and 3", Toast.LENGTH_SHORT);
+
+        // Reference to the key we'll be searching for
+        String sizeKey = getString(R.string.pref_size_key);
+
+        if (preference.getKey().equals(sizeKey)) {
+
+            String stringSize = ((String) (newValue)).trim();
+
+            if (stringSize.equals("")) {
+                stringSize.equals("1");
+            }
+
+            try {
+
+                float size = Float.parseFloat(stringSize);
+
+                if (size > 3 || size <= 0) {
+                    error.show();
+                    return false;
+                }
+            } catch (NumberFormatException nfe) {
+                error.show();
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

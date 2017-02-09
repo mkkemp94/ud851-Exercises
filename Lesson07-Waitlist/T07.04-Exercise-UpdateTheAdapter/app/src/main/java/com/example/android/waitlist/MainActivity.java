@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
         waitlistRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 
+
         // Create a DB helper (this will create the DB if run for the first time)
         WaitlistDbHelper dbHelper = new WaitlistDbHelper(this);
 
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         // TODO (10) Pass the entire cursor to the adapter rather than just the count
         // Create an adapter for that cursor to display the data
-        mAdapter = new GuestListAdapter(this, cursor.getCount());
+        mAdapter = new GuestListAdapter(this, cursor);
 
         // Link the adapter to the RecyclerView
         waitlistRecyclerView.setAdapter(mAdapter);

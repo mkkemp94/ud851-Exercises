@@ -17,10 +17,13 @@
 package com.example.android.todolist.data;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.SQLException;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 
@@ -78,16 +81,37 @@ public class TaskContentProvider extends ContentProvider {
 
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues values) {
+
         // TODO (1) Get access to the task database (to write new data to)
+        final SQLiteDatabase database = mTaskDbHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+
+        Uri returnUri;
 
         // TODO (2) Write URI matching code to identify the match for the tasks directory
+        switch (match) {
+            case TASKS:
+                long rowId = database.insert(TaskContract.TaskEntry.TABLE_NAME, null, values);
+                if (rowId > 0) {
+                    returnUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, rowId);
+                } else {
+                    throw new SQLException("Failed to insert row into " + uri);
+                }
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri" + uri);
+
+        }
 
         // TODO (3) Insert new values into the database
         // TODO (4) Set the value for the returnedUri and write the default case for unknown URI's
 
         // TODO (5) Notify the resolver if the uri has been changed, and return the newly inserted URI
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return returnUri;
     }
 
 
@@ -95,7 +119,29 @@ public class TaskContentProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
 
-        throw new UnsupportedOperationException("Not yet implemented");
+        final SQLiteDatabase database = mTaskDbHelper.getReadableDatabase();
+
+        int match = sUriMatcher.match(uri);
+
+        Cursor resCursor;
+
+        switch (match) {
+            case TASKS:
+                resCursor = database.query(TaskContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
+                default:
+                    throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+
+        resCursor.setNotificationUri(getContext().getContentResolver(), uri);
+
+        return resCursor;
     }
 
 

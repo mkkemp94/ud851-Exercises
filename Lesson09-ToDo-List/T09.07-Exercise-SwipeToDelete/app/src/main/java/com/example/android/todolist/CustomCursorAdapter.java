@@ -21,6 +21,7 @@ import android.database.Cursor;
 import android.graphics.drawable.GradientDrawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,16 +40,26 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
     private Cursor mCursor;
     private Context mContext;
 
+    // On click listener for this class
+    private final ToDoListItemClickHandler mClickHandler;
+
 
     /**
      * Constructor for the CustomCursorAdapter that initializes the Context.
      *
      * @param mContext the current Context
      */
-    public CustomCursorAdapter(Context mContext) {
+    public CustomCursorAdapter(Context mContext, ToDoListItemClickHandler listener) {
         this.mContext = mContext;
+        mClickHandler = listener;
     }
 
+    /**
+     * Interface for updating an item in the to do list
+     */
+    public interface ToDoListItemClickHandler {
+        void onClick(long id, String description, int priority);
+    }
 
     /**
      * Called when ViewHolders are created to fill a RecyclerView.
@@ -156,7 +167,7 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
 
 
     // Inner class for creating ViewHolders
-    class TaskViewHolder extends RecyclerView.ViewHolder {
+    class TaskViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // Class variables for the task description and priority TextViews
         TextView taskDescriptionView;
@@ -172,6 +183,35 @@ public class CustomCursorAdapter extends RecyclerView.Adapter<CustomCursorAdapte
 
             taskDescriptionView = (TextView) itemView.findViewById(R.id.taskDescription);
             priorityView = (TextView) itemView.findViewById(R.id.priorityTextView);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view) {
+
+            int position = getAdapterPosition();
+
+            Log.v("On click", "At position: " + position);
+
+            mCursor.moveToPosition(position);
+
+            int idColumnIndex = mCursor.getColumnIndex(TaskContract.TaskEntry._ID);
+            int descriptionColumnIndex = mCursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_DESCRIPTION);
+            int priorityColumnIndex = mCursor.getColumnIndex(TaskContract.TaskEntry.COLUMN_PRIORITY);
+
+            Log.v("On click", "Id Column Index: " + idColumnIndex);
+            Log.v("On click", "Description Column Index: " + descriptionColumnIndex);
+            Log.v("On click", "Priority column index: " + priorityColumnIndex);
+
+            long id = mCursor.getLong(idColumnIndex);
+            String description = mCursor.getString(descriptionColumnIndex);
+            int priority = mCursor.getInt(priorityColumnIndex);
+
+            Log.v("On click", "Id: " + id);
+            Log.v("On click", "Description: " + description);
+            Log.v("On click", "Priority: " + priority);
+
+            mClickHandler.onClick(id, description, priority);
         }
     }
 }

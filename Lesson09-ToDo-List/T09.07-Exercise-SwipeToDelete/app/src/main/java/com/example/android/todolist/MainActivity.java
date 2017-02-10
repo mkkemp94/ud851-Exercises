@@ -35,7 +35,8 @@ import com.example.android.todolist.data.TaskContract;
 
 
 public class MainActivity extends AppCompatActivity implements
-        LoaderManager.LoaderCallbacks<Cursor> {
+        LoaderManager.LoaderCallbacks<Cursor>,
+        CustomCursorAdapter.ToDoListItemClickHandler {
 
 
     // Constants for logging and referring to a unique loader
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         // Initialize the adapter and attach it to the RecyclerView
-        mAdapter = new CustomCursorAdapter(this);
+        mAdapter = new CustomCursorAdapter(this, this);
         mRecyclerView.setAdapter(mAdapter);
 
         /*
@@ -218,5 +219,16 @@ public class MainActivity extends AppCompatActivity implements
             mAdapter.swapCursor(null);
         }
 
+    @Override
+    public void onClick(long id, String description, int priority) {
+
+        //Toast.makeText(this, description, Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(this, AddTaskActivity.class);
+        intent.putExtra("id", id);
+        intent.putExtra("description", description);
+        intent.putExtra("priority", priority);
+        startActivity(intent);
+    }
 }
 

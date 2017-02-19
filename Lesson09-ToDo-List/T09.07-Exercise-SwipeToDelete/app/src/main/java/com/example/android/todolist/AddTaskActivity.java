@@ -97,7 +97,7 @@ public class AddTaskActivity extends AppCompatActivity {
         if (mExistingTaskId != -2) {
 
             Uri updateUri = ContentUris.withAppendedId(TaskContract.TaskEntry.CONTENT_URI, mExistingTaskId);
-            
+
             int rowsUpdated = getContentResolver().update(updateUri, contentValues, null, null);
             if (rowsUpdated >= 0) {
                 Toast.makeText(this, rowsUpdated + " rows updated!", Toast.LENGTH_LONG).show();

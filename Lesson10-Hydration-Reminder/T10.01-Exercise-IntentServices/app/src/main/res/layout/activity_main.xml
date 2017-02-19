@@ -21,17 +21,6 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <ImageButton
-            android:id="@+id/ib_water_increment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="@string/water_increment_content_desc"
-            android:onClick="incrementWater"
-            android:padding="8dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_local_drink_grey_120px" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -59,6 +48,17 @@
                 android:layout_weight="36"
                 android:visibility="invisible" />
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/ib_water_increment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/water_increment_content_desc"
+            android:onClick="incrementWater"
+            android:padding="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_local_drink_grey_120px" />
     </FrameLayout>
 
     <RelativeLayout

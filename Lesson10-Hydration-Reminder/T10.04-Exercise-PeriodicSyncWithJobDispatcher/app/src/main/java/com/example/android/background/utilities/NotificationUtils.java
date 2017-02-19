@@ -60,8 +60,9 @@ public class NotificationUtils {
 
     public static void remindUserBecauseCharging(Context context) {
 
+        // Start building a notification
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
-                .setColor(ContextCompat.getColor(context, R.color.colorPrimary))
+                .setColor(ContextCompat.getColor(context, R.color.colorPrimary)) // set color to colorPrimary
                 .setSmallIcon(R.drawable.ic_drink_notification)
                 .setLargeIcon(largeIcon(context))
                 .setContentTitle(context.getString(R.string.charging_reminder_notification_title))
@@ -69,16 +70,17 @@ public class NotificationUtils {
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(
                         context.getString(R.string.charging_reminder_notification_body)))
                 .setDefaults(Notification.DEFAULT_VIBRATE)
-                .setContentIntent(contentIntent(context))
-                .addAction(drinkWaterAction(context))
-                .addAction(ignoreReminderAction(context))
+                .setContentIntent(contentIntent(context)) // add an intent to the main activity
+                .addAction(drinkWaterAction(context)) // add an intent to the water service, as an action
+                .addAction(ignoreReminderAction(context)) // add an intent to the ignore service, as an action
                 .setAutoCancel(true);
 
+        // If the phone is new enough, give it a high priority
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             notificationBuilder.setPriority(Notification.PRIORITY_HIGH);
         }
 
-
+        // Now get the notification manager
         NotificationManager notificationManager = (NotificationManager)
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 

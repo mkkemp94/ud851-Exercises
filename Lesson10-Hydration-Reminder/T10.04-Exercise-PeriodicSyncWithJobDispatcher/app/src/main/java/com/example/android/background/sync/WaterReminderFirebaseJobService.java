@@ -15,8 +15,17 @@
  */
 package com.example.android.background.sync;
 
-public class WaterReminderFirebaseJobService {
+import android.content.Context;
+import android.os.AsyncTask;
+
+import com.firebase.jobdispatcher.JobParameters;
+import com.firebase.jobdispatcher.JobService;
+
+// This job service runs the task
+public class WaterReminderFirebaseJobService extends JobService {
     // TODO (3) WaterReminderFirebaseJobService should extend from JobService
+
+    private AsyncTask mBackgroundTask;
 
     // TODO (4) Override onStartJob
         // TODO (5) By default, jobs are executed on the main thread, so make an anonymous class extending
@@ -32,8 +41,53 @@ public class WaterReminderFirebaseJobService {
         // TODO (9) Execute the AsyncTask
         // TODO (10) Return true
 
+    // Executes task which sends out notification and increments... issueChargingReminder()
+    // On the main thread by default
+    @Override
+    public boolean onStartJob(final JobParameters jobParameters) {
+
+        // Let's not do it on the main thread
+        mBackgroundTask = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+
+                // Get context
+                Context context = WaterReminderFirebaseJobService.this;
+
+                // Execute task Action Charging Reminder
+                ReminderTasks.executeTask(context, ReminderTasks.ACTION_CHARGING_REMINDER);
+                return null;
+            }
+
+            // When the job is done...
+            @Override
+            protected void onPostExecute(Object o) {
+
+                // Pass in the job parameters, and No need to reschedule
+                jobFinished(jobParameters, false);
+            }
+        };
+
+        mBackgroundTask.execute();
+
+        // Signal that our job is still doing some work
+        return true;
+    }
+
     // TODO (11) Override onStopJob
         // TODO (12) If mBackgroundTask is valid, cancel it
         // TODO (13) Return true to signify the job should be retried
 
+    // The requirements of the job are no longer met. Ex shut off wifi
+    @Override
+    public boolean onStopJob(JobParameters jobParameters) {
+
+        // Cancel background task if it exists
+        if (mBackgroundTask != null) {
+            mBackgroundTask.cancel(true);
+        }
+
+        // When the conditions are remet, start the job again
+        return true;
+    }
 }
